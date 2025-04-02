@@ -1,0 +1,44 @@
+FC=ifort
+
+COMPILE_TIME=$(shell date +"%d-%m-%Y %H:%M:%S")
+VER=\""0.1.0"\"
+
+FFLAGS=
+FFLINK=
+LDFLAGS=
+INCFLAGS=
+LIBS =
+
+HDF5_INC=/opt/siesta-v4.1.5/DEPENDENCY/hdf5_intel/include
+HDF5_LIB=/opt/siesta-v4.1.5/DEPENDENCY/hdf5_intel/lib
+MKL_LIB=${MKLROOT}/lib/intel64
+
+SRC= kinds.f90 constants.f90 parse_cmd_line.f90 hdf5_wrap_mod.f90 unit_mod.f90 FC4_data_mod.f90 ReconstFC4.f90 main.f90
+OBJ=$(SRC:.f90=.o)
+
+FDEBUG=-O0 -fpp -debug -traceback -check -W1 -warn all -ftrapuv -qopenmp -D__COMPILE_TIME__=\""${COMPILE_TIME}"\" -D__SPR_VERSION__=${VER}
+FOPTIM=-O2 -fpp -xHost -ipo -qopenmp -D__COMPILE_TIME__=\""${COMPILE_TIME}"\" -D__SPR_VERSION__=${VER}
+
+FFLAGS+=$(FDEBUG)
+#FFLAGS+=$(FOPTIM)
+
+INCFLAGS += -I${HDF5_INC}
+
+LDFLAGS += -L${HDF5_LIB}
+LDFLAGS += -L${MKL_LIB}
+
+
+LIBS += -lhdf5 -lhdf5_fortran -lm -ldl
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(FC) $(FFLAGS) $(LDFLAGS) -o reconst4_omp.x $(OBJ) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf reconst4_omp.x
+
+

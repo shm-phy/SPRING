@@ -1,0 +1,16 @@
+
+SRC= kinds.f90 constants.f90 parse_cmd_line.f90 timer_class.f90 hdf5_wrap_mod.f90 lapack_gfort.f90 IndxChng_mod.f90 unit_mod.f90 Helper_m.f90 CreateMesh_mod.f90 FC2_mod.f90 FC3_mod.f90 FC4_mod.f90 spglib_f08.f90 Symmetry_m.f90 TetrahedronQ_m.f90 EwaldSum_mod.f90 EwaldParam.f90 DynaMat_mod.f90 phonon_mod.f90 QuasiMomentumConsrv3rd_m.f90 QuasiMomentumConsrv4th_m.f90 TetrahedronIntegration_m.f90 ThirdOrder_m.f90 IsotopicScatter.f90 FourthOrder_m.f90 Tetrahedron4th_sep.f90 GreensFunc_m.f90 point_defect_m.f90 VelocityKronProd_symm.f90 ThermalConductivity.f90 main.f90 
+OBJ=$(SRC:.f90=.o)
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(MPIFC) $(FFLAGS) $(FFLINK) $(LDFLAGS) -o $(EXEC_NAME) $(OBJ) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf $(EXEC_NAME)
+
+

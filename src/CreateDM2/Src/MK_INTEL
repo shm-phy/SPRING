@@ -1,0 +1,35 @@
+
+FFLAGS=
+FFLINK=
+LDFLAGS=
+INCFLAGS=
+LIBS =
+
+SRC= kinds.f90 constants.f90 parse_cmd_line.f90 hdf5_wrap_mod.f90 IndxChng_mod.f90 unit_mod.f90 FC2_data_mod.f90 DispMatFC2_mod.f90 main.f90
+OBJ=$(SRC:.f90=.o)
+
+FDEBUG=-O0 -coarray=shared -coarray-num-images=1 -debug -traceback -check -ftrapuv -qmkl=sequential
+FOPTIM=-O3 -xHost -ipo -coarray=shared -coarray-num-images=1 -qmkl=sequential
+#FOPTIM=-O3 -xHost -ipo -coarray=distributed -qmkl=sequential
+
+FFLAGS+=$(FOPTIM)
+#FFLAGS+=$(FDEBUG)
+
+INCFLAGS += -I${HDF5_INC}
+
+LDFLAGS += -L${HDF5_LIB}
+LDFLAGS += -L${MKL_LIB}
+
+LIBS += -lhdf5 -lhdf5_fortran -lm -ldl
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(FC) $(FFLAGS) $(LDFLAGS) -o create_disp_mat2.x $(OBJ) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf create_disp_mat2.x
+

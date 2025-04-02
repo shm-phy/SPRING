@@ -1,0 +1,48 @@
+FC=gfortran
+MPIFC=mpif90
+
+COMPILE_TIME=$(shell date +"%d-%m-%Y %H:%M:%S")
+VER=\""0.1.0"\"
+
+FFLAGS=
+FFLINK=
+LDFLAGS=
+INCFLAGS=
+LIBS =
+
+COARR_LIB=/home/soham/Applications/GNU/opencoarrays/lib
+HDF5_INC=/home/soham/Applications/GNU/hdf5/include
+HDF5_LIB=/home/soham/Applications/GNU/hdf5/lib
+LAPACK_LIB=/home/soham/Applications/GNU/lapack
+BLAS_LIB=/home/soham/Applications/GNU/blas
+
+SRC= kinds.f90 constants.f90 timer_class.f90 parse_cmd_line.f90 lapack_gfort.f90 unit_mod.f90 hdf5_wrap.f90 CreateMat.f90 main.f90 
+OBJ=$(SRC:.f90=.o)
+
+FDEBUG=-Og -cpp -g -Wall -Wextra -Wunused-parameter -Wconversion -pedantic -fimplicit-none -fcheck=all -fbounds-check -fbacktrace -ftrapv -ffpe-trap=zero -finit-real=snan -D__COMPILE_TIME__=\""${COMPILE_TIME}"\" -D__SPR_VERSION__=${VER}
+FOPTIM=-O2 -cpp -flto -march=native -D__COMPILE_TIME__=\""${COMPILE_TIME}"\" -D__SPR_VERSION__=${VER}
+
+FFLAGS+=$(FDEBUG)
+#FFLAGS+=$(FOPTIM)
+
+INCFLAGS += -I${HDF5_INC}
+
+LDFLAGS += -L${HDF5_LIB}
+LDFLAGS += -L${BLAS_LIB}
+LDFLAGS += -L${LAPACK_LIB}
+
+LIBS += -lhdf5 -lhdf5_fortran -llapack -lblas -lm -ldl
+#LIBS += -lhdf5 -lhdf5_fortran -lm -ldl
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(FC) $(FFLAGS) $(FFLINK) $(LDFLAGS) -o LSq.x $(OBJ) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf LSq.x
+
+

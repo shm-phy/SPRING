@@ -1,0 +1,16 @@
+
+SRC= kinds.f90 constants.f90 parse_cmd_line.f90 hdf5_wrap_mod.f90 unit_mod.f90 FC2_data_mod.f90 ReconstFC2.f90 main.f90 
+OBJ=$(SRC:.f90=.o)
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(FC) $(FFLAGS) $(LDFLAGS) -o $(EXEC_NAME) $(OBJ) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf $(EXEC_NAME)
+
+

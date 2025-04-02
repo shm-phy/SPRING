@@ -1,0 +1,11 @@
+**/__pycache__/
+**/*.h5
+**/time.log
+**/*.mod
+**/*.o
+**/prog_*
+**/*.x
+**/*.log
+bin/
+.*.sw?
+.sw?

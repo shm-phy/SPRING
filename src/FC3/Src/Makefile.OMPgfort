@@ -1,0 +1,47 @@
+FC=gfortran
+MPIFC=mpif90
+
+FFLAGS=
+FFLINK=
+LDFLAGS=
+INCFLAGS=
+LIBS =
+
+COARR_LIB=/opt/opencoarrays/lib
+HDF5_INC=/opt/hdf5_gcc/hdf5_1.12.2/include
+HDF5_LIB=/opt/hdf5_gcc/hdf5_1.12.2/lib
+LAPACK_LIB=/opt/netlib/lapack-3.10.1/lib
+BLAS_LIB=/opt/netlib/blas-3.10/lib
+
+SPGLIB=/home/soham/Applications/spglib/lib/libsymspg.a
+
+SRC= kinds.f90 constants.f90 timer_class.f90 parse_cmd_line.f90 lapack_gfort.f90 IndxChng_mod.f90 unit_mod.f90 spglib_f08.f90 Symmetry_m.f90 CutInfo_m.f90 HelperRoutines.f90 FC_obj_m.f90 main.f90 
+OBJ=$(SRC:.f90=.o)
+
+FDEBUG=-Og -g -cpp -DOMP -Wall -Wextra -Wunused-parameter -Wconversion -pedantic -fimplicit-none -fcheck=all -fbounds-check -fbacktrace -ftrapv -ffpe-trap=zero -finit-real=snan -fopenmp
+FOPTIM=-O2 -cpp -DOMP -flto -march=native -fopenmp
+
+FFLAGS+=$(FDEBUG)
+#FFLAGS+=$(FOPTIM)
+
+INCFLAGS += -I${HDF5_INC}
+
+LDFLAGS += -L${HDF5_LIB}
+LDFLAGS += -L${BLAS_LIB}
+LDFLAGS += -L${LAPACK_LIB}
+
+LIBS += -lhdf5 -lhdf5_fortran -llapack -lblas -lm -ldl
+#LIBS += -lhdf5 -lhdf5_fortran -lm -ldl
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -o $@ $(INCFLAGS) -c $<
+
+build: $(OBJ)
+		$(FC) $(FFLAGS) $(FFLINK) $(LDFLAGS) -o FC3_omp.x $(OBJ) $(SPGLIB) $(LIBS)
+
+clean:
+		rm -rf $(OBJ)
+		rm -rf *.mod
+		rm -rf FC3_omp.x
+
+

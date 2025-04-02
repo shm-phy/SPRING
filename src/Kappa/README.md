@@ -1,0 +1,61 @@
+# kappa.x / kappa_iter.x 
+This program computes thermal conductivity using both iterative and non-iterative methods, based on the harmonic and anharmonic interatomic force constants (IFCs) generated in previous steps. 
+This program can run in parallel through **Fortran Coarray**.  
+One must install [**OpenCoarrays**](http://www.opencoarrays.org/) to use the Fortran Coarray feature with the _gfortran_ compiler. For Intel Fortran Compiler (_ifort_ or _ifx_), no extra dependencies need to be installed (recommended). 
+- If you use _gfortran_ with _OpenCoarrays_, run the executable like an ordinary MPI program:
+```sh
+mpirun -np NPROCS ./kappa.x -inp [INPUT FILE] -T [TEMPERATURE] 
+```
+- If you use Intel Fortran Compiler, you can set the number of processors to run the program in parallel through an environment variable:
+```sh
+export FOR_COARRAY_NUM_IMAGES=NPROCS
+```
+Then run the program like any ordinary executable:
+```sh
+./kappa.x -inp [INPUT FILE] -T [TEMPERATURE] 
+```
+
+##### Executable name: _kappa.x_ / _kappa_iter.x_
+
+#### Dependency
+- [Spglib](https://spglib.github.io/spglib/)
+- [HDF5](https://www.hdfgroup.org/solutions/hdf5/)
+- [LAPACK and BLAS](https://netlib.org/lapack/lug/node11.html) or [Intel-mkl](https://www.intel.com/content/www/us/en/developer/tools/oneapi/overview.html#gs.mgzhln)
+
+#### Input
+The following input files are needed to run this program:
+- The input namelist file. It uses four Namelist of the input Namelist file: **_FCInfo_**, **_CrystalInfo_**, **_AtmInfo_**, and **_AnhInfo_**. Detailed descriptions of the variables in the first three namelist file can be found [here](src/FC2/README.md). Variables in **_AnhInfo_** namelist are discussed below.
+- The Second-Order force-constant file (output of the program _reconst2.x_ or _renorm.x_): **FC_2nd_`${prefix}${T}`K.h5**
+- The Third-Order force-constant file (output of the program _reconst3.x_): **FC_3rd_`${prefix}${T}`K.h5**
+- **(Optional)** The Fourth-Order force-constant file (output of the program _reconst4.x_): **FC_4th_`${prefix}${T}`K.h5**
+
+ 
+**Description of Command line arguments:**
+Two variables can be optionally set through command line arguments:
+- **_inp_:** The input filename is the name of the Namelist file. Default: _input.nml_
+- **_T_:** Temperature T in K, at which the MD run was performed, or the temperature of the TSS method. The Force-displacement dataset file should have this temperature in the filename. Default: 300.0
+
+**Description of the variable in _AnhInfo_ Namelist:**
+```sh
+&AnhInfo
+    qmesh           = 17 17 17
+    isotope         = .true.
+    g2iso           = 0.0   0.000582701
+/
+
+```
+- **_qmesh_:** Integer variable (1d array of length 3). This variable determines the q-point mesh for the thermal conductivity calculation. 
+- **_isotope_:** Logical variable. This variable determines whether to compute isotopic impurity scattering.
+- **_g2iso_:** A real-valued variable (1-dimensional array with a length of _Nbasis_). This parameter represents the isotopic mass variance for each atom within the basis set. Its impact is relevant solely when _isotope_ is set to `.true.`.
+
+
+#### Output
+After successful execution, two files will be generated: 
+- kappa_`${prefix}${T}`K.h5
+- linewidth_`${prefix}${T}`K.txt
+
+The phonon linewidth details for the q-points in the reduced Brillouin zone are stored in the file _linewidth_`${prefix}${T}`K.txt_. The scattering rate corresponds to twice the value of the phonon linewidth.
+
+#### License
+
+[GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)

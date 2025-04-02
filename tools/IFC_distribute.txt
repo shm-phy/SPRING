@@ -1,0 +1,36 @@
+
+
+ -Nchunk  =>   ChnkSize
+
+Chnklen = NFC_tot / Nchunk 
+=>So, Nchunk must be less than NFC_total ( NChunk < NFC_tot )
+
+! -= Devide the FCs to be covered into chunks of size Nchunk =- !
+!                    --------------------------                 !
+!                    | 1          |  Chnklen  |                 !
+!                    --------------------------                 !
+!                    |2xChnklen   |3xChnklen  |                 !
+!                    --------------------------                 !
+!                    |3xChnklen   |4xChnklen  |                 !
+!                    --------------------------                 !
+!                    |4xChnklen   |5xChnklen  |                 !
+!                    --------------------------                 !
+!                    |5xChnklen   |6xChnklen  |                 !
+!                    --------------------------                 !
+!                    |6xChnklen   |7xChnklen  |                 !
+!                    --------------------------                 !
+!                    |7xChnklen   |8xChnklen  |                 !
+!                    --------------------------                 !
+!                        .               .                      !
+!                        .               .                      !
+!                        .               .                      !
+!                    --------------------------                 !
+!                    |(ChnkSize   |           |                 !
+!                    |  xChnklen) |  NFCs     |                 !
+!                    --------------------------                 !
+! -= Devide the FCs to be covered into chunks of size Nchunk =- !
+
+
+Each processor compute ( Nchunk / ( num_images() - 1 ) ) chunks
+=> So, Nchunk must be greater than or equal to (Nprocs-1)  ( NChunk >= (Nprocs-1) )
+

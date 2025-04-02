@@ -1,0 +1,23 @@
+
+python3 ReadForcDisp.py -inp input_Si.nml -T 80 -ts 5000 -DFfile out.log -MDEfile Si.MDE
+
+TSS.x -inp input.nml -T 100 -Tsnap 120 -Nsnap 65 -type 1 -Fcalculator siesta 2>&1 | tee TSS.out
+
+FC2.x -inp input.nml -AdvncOut T 2>&1 | tee NaCl_FC2.out
+bash FC2_run_serial.sh 2>&1 | tee createMat2.out
+
+FC3.x -inp input.nml -AdvncOut T 2>&1 | tee NaCl_FC3.out
+bash FC3_run_serial.sh 2>&1 | tee createMat3.out
+
+longEw.x -inp input.nml -T 80 2>&1 | tee longEW_NaCl.out
+
+LSq.x -inp input.nml -T 80 -CutOff -1 2>&1 | tee LSq.out
+reconst2.x -inp input.nml -T 80 2>&1 | tee reconst2.out
+
+disp.x -inp input.nml -T 80 2>&1 | tee disp.out
+python3 plot.py -inp input.nml -T 80
+
+reconst4.x -inp input.nml -T 120 2>&1 | tee reconst4.out
+
+renorm.x -inp input.nml -T 100 2>&1 | tee renorm.out
+
