@@ -33,7 +33,7 @@ make all
 ## Documentation
 Comprehensive documentation for each subprogram is located within the subdirectories under the `src` directory.
 ## Workflow Diagram
-[![Workflowdiag](tools/workflow_diagram.pdf)]()
+[![Workflowdiag](tools/workflow_diagram.png)]()
 
 ## License
 
